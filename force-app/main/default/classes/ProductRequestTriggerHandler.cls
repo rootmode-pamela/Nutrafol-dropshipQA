@@ -25,7 +25,7 @@ public class ProductRequestTriggerHandler {
 			//Drop Ship Defaults
             if (prodReq.RecordTypeId == Schema.SObjectType.Product_Request__c.getRecordTypeInfosByName().get('Drop Ship').getRecordTypeId()){
             	Account a = [SELECT Id, Partner_Type__c FROM Account WHERE Id = :prodReq.Account_Name__c LIMIT 1];
-                
+                prodReq.Approval_Status__c = 'New';
                 if(a.Partner_Type__c == 'Salon'){
                         prodReq.Pricebook__c = Constants_ProductRequest.DROP_SHIP_PRICEBOOK_SALON_ID;                  
                 } else {
