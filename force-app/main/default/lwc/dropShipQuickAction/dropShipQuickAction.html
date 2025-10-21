@@ -1,0 +1,116 @@
+<template>
+    <lightning-card title="New Product Request" icon-name="standard:product_request">
+        <div class="slds-p-around_medium">
+            <lightning-record-edit-form
+                object-api-name="Product_Request__c"
+                record-type-id={recordTypeId}
+                onsuccess={handleSuccess}
+                onerror={handleError}>
+                
+                <!-- Hidden field for Account lookup -->
+                <lightning-input-field
+                    field-name="Account_Name__c"
+                    value={recordId}
+                    class="slds-hide">
+                </lightning-input-field>
+
+                <!-- Hidden field for Requested By User -->
+                <lightning-input-field
+                    field-name="Requested_By__c"
+                    value={userId}
+                    class="slds-hide">
+                </lightning-input-field>
+
+                <!-- Hidden field for Requested By User -->
+                <lightning-input-field
+                    field-name="Requested_By__c"
+                    value={userId}
+                    class="slds-hide">
+                </lightning-input-field>
+
+                <!-- Hidden field for Status -->
+                <lightning-input-field
+                    field-name="Approval_Status__c"
+                    value="New"
+                    class="slds-hide">
+                </lightning-input-field>
+
+                <!-- Customer Name Dropdown (Contact Selection) -->
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label" for="contact-dropdown">
+                        <abbr class="slds-required" title="required">*</abbr>
+                        Customer Name
+                    </label>
+                    <div class="slds-form-element__control">
+                        <lightning-combobox
+                            name="customerName"
+                            label="Customer Name"
+                            variant="label-hidden"
+                            placeholder="Select a Contact"
+                            options={contactOptions}
+                            value={selectedContactId}
+                            onchange={handleContactChange}
+                            required>
+                        </lightning-combobox>
+                    </div>
+                </div>
+
+                <!-- Purpose -->
+                <lightning-input-field
+                    field-name="Purpose__c"
+                    required>
+                </lightning-input-field>
+
+                <!-- Street -->
+                <lightning-input-field
+                    field-name="Street__c"
+                    value={street}
+                    required>
+                </lightning-input-field>
+
+                <!-- City -->
+                <lightning-input-field
+                    field-name="City__c"
+                    value={city}
+                    required>
+                </lightning-input-field>
+
+                <!-- State -->
+                <lightning-input-field
+                    field-name="State__c"
+                    value={state}
+                    required>
+                </lightning-input-field>
+
+                <!-- Zip -->
+                <lightning-input-field
+                    field-name="Zip__c"
+                    value={zip}
+                    required>
+                </lightning-input-field>
+
+                <!-- Country -->
+                <lightning-input-field
+                    field-name="Country__c"
+                    value={country}
+                    required>
+                </lightning-input-field>
+
+                <!-- Action Buttons -->
+                <div class="slds-m-top_medium">
+                    <lightning-button
+                        variant="neutral"
+                        label="Cancel"
+                        onclick={handleCancel}
+                        class="slds-m-right_x-small">
+                    </lightning-button>
+                    <lightning-button
+                        variant="brand"
+                        type="submit"
+                        label="Save">
+                    </lightning-button>
+                </div>
+            </lightning-record-edit-form>
+        </div>
+    </lightning-card>
+</template>

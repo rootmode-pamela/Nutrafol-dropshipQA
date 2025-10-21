@@ -1,0 +1,176 @@
+<aura:component controller="productRequestFormController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="pricebookName" type="String" access="Public" default = "Standard Price Book"/>
+    <aura:attribute name="pricebookId" type="String" access="Public"/>
+    <aura:attribute name="productData" type="productCategoryData[]"/>
+    <aura:attribute name="activeSection" type="String"/>
+    <aura:attribute name="openSections" type="String[]"/>
+    <aura:attribute name="formValid" type="Boolean" default="false"/>
+    <aura:attribute name="totalPrice" type="Currency"/>
+    <aura:attribute name="totalQuantity" type="Integer"/>
+    <aura:attribute name="pageReference" type="Object"/>
+    <aura:attribute name="url" type="String"/>
+    <aura:attribute name="spinner" type="Boolean" default="false" />
+    <aura:attribute name="overAllotment" type="Boolean" default="false"/>
+    <aura:attribute name="trunkStockPeriodClosed" type="Boolean" default="false"/>
+    <aura:attribute name="hideSubmissionForm" type="Boolean" default="false"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <lightning:navigation aura:id="navService"/>
+    
+    <div class="exampleHolder">
+        <aura:if isTrue="{! v.spinner }">
+            <lightning:spinner alternativeText="Loading" />
+            <aura:set attribute="else">
+                
+                
+                <aura:if isTrue="{!v.hideSubmissionForm}">
+                    <lightning:card title="Trunk Stock Submission Unavailable At This Time" iconName="custom:custom1">
+                    <div>
+                        <p>&nbsp;</p>
+                        
+                    </div>  
+                    <aura:if isTrue="{!v.trunkStockPeriodClosed}">
+                       <div class="slds-p-horizontal_medium">
+
+                        <div class="slds-scoped-notification slds-media slds-media_center slds-theme_warning" role="status">
+                            <div class="slds-media__figure">
+                                <span class="slds-icon_container slds-icon-utility-warning" title="warning">
+                                    <lightning:icon iconName="utility:date_input" size="xx-small" />
+                                    <span class="slds-assistive-text">past period warning</span>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>The Open Trunk Stock period for this month has passed.  Please contact your AD for Trunk Stock requests.
+                                </p>
+                            </div>
+                        </div>
+                           </div>
+
+                        <div>
+                            <p>&nbsp;</p>
+                            
+                        </div>   
+
+                    </aura:if>
+                    <aura:if isTrue="{!v.overAllotment}">
+                          <div class="slds-p-horizontal_medium">
+
+                        <div class="slds-scoped-notification slds-media slds-media_center slds-theme_warning" role="status">
+                            <div class="slds-media__figure">
+                                <span class="slds-icon_container slds-icon-utility-warning" title="warning">
+                                    <lightning:icon iconName="utility:alert" size="xx-small" />
+                                    <span class="slds-assistive-text">over allotment warning</span>
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <p>BDMs are allowed 1 Trunk Stock submission each month, and your allotment has been used this month.  Please contact your AD for requests.
+                                </p>
+                            </div>
+                        </div>
+                        </div>
+                        <p>&nbsp;</p>
+                              
+                    </aura:if>
+                          <div class="slds-p-horizontal_medium">
+
+                    <p>&nbsp;</p>
+                    <p>Drop Ship orders may still be submitted.  Navigate to the Account you wish to ship to, and look for the Drop Ship button at the upper right of the page.</p>
+                        </div>
+                        </lightning:card>
+                   
+                    <aura:set attribute="else">
+                        
+                        
+                        <lightning:card title="{!'Order Form - ' +  v.pricebookName }" iconName="custom:custom1">
+                            <lightning:layout>
+                                <lightning:layoutItem size="3"></lightning:layoutItem><lightning:layoutItem size="3"><span class="slds-text-color_success" >Total Quantity:  {!v.totalQuantity} </span>  </lightning:layoutItem>  <lightning:layoutItem size="3"><span class="slds-text-color_success">Total Amount: ${!v.totalPrice} </span></lightning:layoutItem><lightning:layoutItem size = "3"></lightning:layoutItem>
+                            </lightning:layout>
+                            
+                            <aura:set attribute="actions">
+                                <lightning:button name="submitButton" aura:id = 'submitButton' label="Submit" onclick="{!c.handleShowPreview}" />
+                            </aura:set>
+                            
+                            <div class="slds-brand-band slds-brand-band_small">
+                                <div class="slds-box">
+                                    
+                                    <lightning:accordion allowMultipleSectionsOpen = "true" 
+                                                         onsectiontoggle="{! c.handleSectionToggle }" 
+                                                         activeSectionName="{!v.activeSection}"  >
+                                        <aura:iteration items="{!v.productData}" var="tab" indexVar="key" >
+                                            <lightning:accordionSection label="{!tab.tabName}" name="{!tab.tabName}" >
+                                                <aura:set attribute="actions">
+                                                    <!-- <aura:if isTrue="{!not(tab.tabOrderValid)}">
+                        <lightning:badge class=".slds-badge .slds-theme_warning" label="{! 'Qty must be in multiples of ' +  tab.tabCaseQuantity}"/>
+                        </aura:if> -->
+                                                    <aura:if isTrue="{!tab.tabOrderQuantity>0}">
+                                                        <lightning:badge label="{!tab.tabOrderQuantity}"/>
+                                                    </aura:if>  
+                                                    
+                                                </aura:set>
+                                                
+                                                <lightning:card>
+                                                    <lightning:tile>
+                                                        <lightning:layout  class="slds-border_bottom" >
+                                                            <lightning:layoutItem padding="horizontal-small" size="2">Sku</lightning:layoutItem>
+                                                            <lightning:layoutItem padding="horizontal-small" size="3">Description</lightning:layoutItem>
+                                                            <lightning:layoutItem padding="horizontal-small" size="2">Unit Price</lightning:layoutItem>
+                                                            <lightning:layoutItem padding="horizontal-small" size="2">Quantity</lightning:layoutItem>
+                                                            <lightning:layoutItem padding="horizontal-small" size="1">Max Quantity</lightning:layoutItem>
+                                                            <lightning:layoutItem padding="horizontal-small" size="2">Total Price</lightning:layoutItem>
+                                                        </lightning:layout>
+                                                    </lightning:tile>
+                                                    
+                                                    
+                                                    <aura:iteration items="{!tab.products}" var="obj" indexVar="prod">
+                                                        <lightning:tile>
+                                                            <lightning:layout class="slds-border_bottom" multipleRows = "true">
+                                                                <lightning:layoutItem size = "1" padding="horizontal-small"><span class="slds-text-title_caps">{!obj.sku}</span> </lightning:layoutItem>
+                                                                <lightning:layoutItem  size = "4" padding="horizontal-small"><span class="slds-text-title_caps">{!obj.description}</span> </lightning:layoutItem>
+                                                                <lightning:layoutItem  size = "2" padding="horizontal-small"><lightning:input disabled = "true" type="number" aura:id="{!'price-' + tab.tabName + '-'+ prod}" formatter="currency" step="0.01" value="{!obj.price}" name="{!'price-' + tab.tabName + '-'+ prod}"/> </lightning:layoutItem>
+                                                                <lightning:layoutItem  size = "2" padding="horizontal-small"><lightning:input aura:id = "quantityInput" type="number" min="1" max="{!obj.maxQuantity}" value="{!obj.quantity}" name="{! key + '-'+ prod}" onblur="{! c.handleChange }" /></lightning:layoutItem>
+                                                                <lightning:layoutItem  size = "1" padding="horizontal-small"><lightning:input disabled="true" aura:id = "maxQuantity" type="number" value="{!obj.maxQuantity}" /></lightning:layoutItem>
+                                                                <lightning:layoutItem  size = "2" padding="horizontal-small"><lightning:input disabled="true" type="number" aura:id="{!'amount-' + tab.tabName + '-'+ prod}" formatter="currency" step="0.01" value="{!obj.totalAmount}" name="{! 'amount-'+ tab.tabName + '-'+ prod}"/> </lightning:layoutItem>
+                                                            </lightning:layout >
+                                                        </lightning:tile>
+                                                        
+                                                    </aura:iteration> 
+                                                    
+                                                </lightning:card>  
+                                                
+                                                <aura:if isTrue="{!tab.tabCaseQuantity>0}">
+                                                    
+                                                    <!--         <lightning:card>
+                        <lightning:layout>
+                            <lightning:layoutItem size = "8"></lightning:layoutItem>
+                       <lightning:layoutItem size = "4" padding="horizontal-small"> Quantities must be multiples of {!tab.tabCaseQuantity} </lightning:layoutItem>
+                           <lightning:layoutItem class="slds-border_top" size = "2" padding="horizontal-small"> <lightning:input type="checkbox" disabled="true" checked="{!tab.tabOrderValid}" label = "Valid"/> </lightning:layoutItem>
+                        <lightning:layoutItem class="slds-border_top" size = "3" padding="horizontal-small"><lightning:input disabled="true" value="{!tab.tabCaseQuantity}" label = "Case Quantity"/></lightning:layoutItem>
+      <lightning:layoutItem class="slds-border_top" size = "3" padding="horizontal-small"><lightning:input disabled="true" value="{!tab.tabOrderQuantity}" label = "Ordered Quantity"/></lightning:layoutItem> 
+                    </lightning:layout> 
+                    </lightning:card>  -->
+                                                    
+                                                    
+                                                </aura:if>
+                                                
+                                            </lightning:accordionSection>
+                                        </aura:iteration>
+                                    </lightning:accordion>			
+                                </div>
+                            </div>
+                            
+                            
+                        </lightning:card>
+                    </aura:set>
+                </aura:if>
+                
+            </aura:set>
+        </aura:if>
+    </div>
+    
+    <lightning:overlayLibrary aura:id='previewModal'>
+        
+    </lightning:overlayLibrary>
+    
+    
+</aura:component>

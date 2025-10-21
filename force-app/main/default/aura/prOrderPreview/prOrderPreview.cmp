@@ -1,0 +1,20 @@
+<aura:component controller="productRequestFormController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" >
+    
+    <aura:attribute name="data" type="Object"/>
+ 	<aura:attribute name="columns" type="List" />
+    <aura:attribute name="productData" type="productCategoryData[]"/>
+	
+    <aura:handler name="init" value="{!this}" action="{!c.doInit }"/>
+    
+    
+    <lightning:card>
+
+       <lightning:dataTable
+     			keyField="sku"
+                data="{! v.data }"
+                columns="{! v.columns }"
+                hideCheckboxColumn="true"/>  
+    
+    
+    </lightning:card>
+</aura:component>
