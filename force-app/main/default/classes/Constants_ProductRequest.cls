@@ -20,7 +20,7 @@ public class Constants_ProductRequest {
     public static final String DROP_SHIP_PRICEBOOK_MD_ID = getPriceBookId('Trunk Stock');  
     public static final String DROP_SHIP_PRICEBOOK_SALON_ID = getPriceBookId('Trunk Stock Salon');  
     public static final Boolean DROP_SHIP_NEEDS_APPROVAL = true;
-    public static final String DROP_SHIP_APPROVAL_STATUS_ONSUBMIT = 'Submitted for Approval';
+    public static final String DROP_SHIP_APPROVAL_STATUS_ONSUBMIT = 'Requested Approval Process';
     public static final String DROP_SHIP_APPROVER_ID = [SELECT Id FROM USER WHERE Username LIKE 'shayna@nutrafol.com%'].Id;
     
     //Admin Event Product Requests

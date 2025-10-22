@@ -99,7 +99,7 @@ public class ProductRequestTriggerHandler {
        
     public static void createOrders(Set<id> productRequestIdSet){
             List<Product_Request__c> productRequestList = [SELECT Id, Name, Account_Name__c, Account_Partner_Type__c,
-                                                           Customer_Name__c, Requestor_Email__c, Street__c,
+                                                           Customer_Name__c, Requestor_Email__c, Street__c, Skip_order_Confirmation_Email__c,
                                                            City__c, State__c, Zip__c, Country__c, Pricebook__c,
                                                            		
                                                                     (SELECT Id,
@@ -121,6 +121,7 @@ public class ProductRequestTriggerHandler {
                 productRequestLineMap.put(productReq.Id, productReq.Product_Request_Line_Items__r);
                 Order orderToInsert = new  Order();
                 orderToInsert.Name = productReq.Name;
+                orderToInsert.Skip_Order_Emals__c = productReq.Skip_order_Confirmation_Email__c;
                 orderToInsert.EffectiveDate = system.today();
                 orderToInsert.Status = Constants.NEW_ORDER_STATUS;
                 orderToInsert.RecordTypeId = RT.Id;
